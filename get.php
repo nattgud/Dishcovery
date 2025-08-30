@@ -12,7 +12,9 @@ $days = [
 	"friday" =>		5,
 	"saturday" =>	6
 ];
-$tdata = file_get_contents("https://infinite-boxes.com/mat/getdata.php?lat=".((isset($_GET["lat"]))?urlencode($_GET["lat"]):"")."&long=".((isset($_GET["long"]))?urlencode($_GET["long"]):"")."&dist=".((isset($_GET["dist"]))?intval($_GET["dist"]):15));
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+$host   = $_SERVER['HTTP_HOST'];
+$tdata = file_get_contents($scheme."://".$host."/mat/getdata.php?lat=".((isset($_GET["lat"]))?urlencode($_GET["lat"]):"")."&long=".((isset($_GET["long"]))?urlencode($_GET["long"]):"")."&dist=".((isset($_GET["dist"]))?intval($_GET["dist"]):15));
 $data = json_decode($tdata, true);
 $finalData = [];
 foreach($data as $place) {

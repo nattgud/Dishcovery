@@ -1,20 +1,16 @@
 <?php
-// --- KONFIG (fyll i om du vill hårdkoda din position; annars kan du skicka via ?lat=&lon=&distance_km= ) ---
-$USER_LAT = null;   // t.ex. 56.029;
-$USER_LON = null;   // t.ex. 14.156;
-$MAX_KM   = 10;     // standardavstånd i kilometer
+$USER_LAT = null;
+$USER_LON = null; 
+$MAX_KM   = 10; 
 
 header('Content-Type: application/json; charset=utf-8');
 
-// --- Läs in parametrar (om givna) ---
 $lat = isset($_GET['lat']) ? floatval($_GET['lat']) : $USER_LAT;
 $lon = isset($_GET['long']) ? floatval($_GET['long']) : $USER_LON;
 $maxKm = isset($_GET['dist']) ? floatval($_GET['dist']) : $MAX_KM;
 
-// Fallback om inget angetts alls: Kristianstad centrum-ish
 if ($lat === null || $lon === null) { $lat = 56.029; $lon = 14.156; }
 
-// --- Hjälpfunktioner ---
 function http_get_json($url, $payload=null) {
     $opts = [
         'http' => [
@@ -46,7 +42,7 @@ function normalize_time($t) {
     if (preg_match('/^\d{1,2}$/', $t))      { $h=str_pad($t,2,'0',STR_PAD_LEFT); return "$h:00"; }
     return null;
 }
-// Förenklad parser för vanliga OSM-strängar
+
 function parse_opening_hours_basic($s) {
     global $WEEK,$DAYMAP;
     $hours = blank_hours();
@@ -86,8 +82,8 @@ function haversine_km($lat1,$lon1,$lat2,$lon2){
     return $R*2*asin(min(1,sqrt($a)));
 }
 
-// --- Bygg Overpass-fråga (hämtar lite bredare område än maxKm och filtrerar sen lokalt) ---
-$radiusMeters = intval($maxKm*1000);//max(1000, intval($maxKm*1000) + 1000); // liten buffert
+
+$radiusMeters = intval($maxKm*1000);
 $q = <<<QL
 [out:json][timeout:25];
 (
@@ -106,7 +102,6 @@ QL;
 
 $resp = http_get_json('https://overpass-api.de/api/interpreter', $q);
 
-// --- Sammanställ & filtrera ---
 $out = [];
 $seen = [];
 
@@ -116,40 +111,34 @@ if (!empty($resp['elements'])) {
         $name = $tags['name'] ?? null;
         if (!$name) continue;
 
-        // Snabbmatfilter
         $isFast = (
 			(($tags['amenity'] ?? '') === 'fast_food') ||
 			(isset($tags['cuisine']) && preg_match("/$cuisineRegex/u", $tags['cuisine']))
 		);
 		if (!$isFast) continue;
 
-        // Måste ha opening_hours
         $oh = $tags['opening_hours'] ?? '';
         if ($oh === '') continue;
 
-        // Position (node: lat/lon, way/relation: center.lat/center.lon)
         if (isset($el['lat']) && isset($el['lon'])) {
             $plat = floatval($el['lat']); $plon = floatval($el['lon']);
         } elseif (isset($el['center']['lat']) && isset($el['center']['lon'])) {
             $plat = floatval($el['center']['lat']); $plon = floatval($el['center']['lon']);
         } else {
-            continue; // ingen position -> hoppa
+            continue;
         }
 
-        // Avståndsfilter
         $dist = haversine_km($lat, $lon, $plat, $plon);
         if ($dist > $maxKm) continue;
 
-        // De-dup
         $key = ($el['id'] ?? uniqid()) . '|' . $name;
         if (isset($seen[$key])) continue;
         $seen[$key] = true;
 
-        // Parse och pruna tomma dagar
         $hoursRaw = parse_opening_hours_basic($oh);
         $hours = [];
         foreach ($hoursRaw as $day=>$ranges) {
-            if (!empty($ranges)) $hours[$day] = $ranges; // varje range: {open,close}
+            if (!empty($ranges)) $hours[$day] = $ranges;
         }
         if (empty($hours)) continue;
 
@@ -167,8 +156,6 @@ if (!empty($resp['elements'])) {
     }
 }
 
-// Sortera alfabetiskt
 usort($out, fn($a,$b)=>strcoll($a['name'],$b['name']));
 
-// Svara
 echo json_encode($out, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT);

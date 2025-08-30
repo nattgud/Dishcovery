@@ -55,7 +55,6 @@
 		ajax(draw, "get.php?lat="+lat+"&long="+long+"&dist="+(Number(dist)+Number(acc)));
 	}
 	function ajax(f, url) {
-		progress();
 		var xhr = new XMLHttpRequest();
 		xhr.open("GET", url, true);
 		xhr.onload = function() {
@@ -74,7 +73,7 @@
 		xhr.send();
 	}
 	function draw(data) {
-		progress();
+		progress("Populating list");
 		let out = document.querySelector("#out");
 		out.innerHTML = "";
 		if(data.length === 0) {
