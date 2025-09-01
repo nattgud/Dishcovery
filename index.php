@@ -15,6 +15,8 @@
 			text-align: left;
 		}
 	</style>
+	<script src="fastfood.js?r=<?php echo rand(0, 9999999); ?>"></script>
+	<script src="js.js?r=<?php echo rand(0, 9999999); ?>"></script>
 	<script>
 	let prog = 0;
 	let dist = 8;
@@ -52,25 +54,12 @@
 	function getData(lat, long, acc) {
 		progress("Getting places to eat");
 		document.querySelector("#dist").innerText = dist+"+"+acc;
-		ajax(draw, "get.php?lat="+lat+"&long="+long+"&dist="+(Number(dist)+Number(acc)));
-	}
-	function ajax(f, url) {
-		var xhr = new XMLHttpRequest();
-		xhr.open("GET", url, true);
-		xhr.onload = function() {
-			if (xhr.status === 200) {
-				var data = JSON.parse(xhr.responseText);
-				console.log(data);
-				if(data !== false) {
-					f(data);
-				} else {
-					alert("Something weird happened. Try again.");
-				}
-			} else {
-				alert("Something went wrong. Try again.");
-			}
-		};
-		xhr.send();
+		getMyData(draw, {
+			long: long,
+			lat: lat,
+			dist: (Number(dist)+Number(acc))
+		});
+		//ajax(draw, "get.php?lat="+lat+"&long="+long+"&dist="+(Number(dist)+Number(acc)));
 	}
 	function draw(data) {
 		progress("Populating list");
@@ -131,7 +120,7 @@
 </script>
 </head>
 <body>
-<p>Search radius: <span id="dist">5</span>km<input type="range" min="1" max="100" step="1" value="5" style="width: 100%;" onchange="updDist(this.value);" id="distinput"></p>
+<p>Search radius: <span id="dist">8</span>km<input type="range" min="1" max="100" step="1" value="8" style="width: 100%;" onchange="updDist(this.value);" id="distinput"></p>
 <table><thead><th></th><th>Distance</th><th colspan=3>Name</th><th>Open</th><th>Close</th></tr></thead><tbody id="out"></tbody></table>
 <p id="log">Loading <span id="progress"></span></p>
 </body>
