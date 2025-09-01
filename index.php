@@ -93,7 +93,6 @@
 				icon.src = "img/"+store.state+".png";
 				td[0].appendChild(icon);
 
-				//td[1].innerText = {"closed": "Stängd", "open": "Öppet", "soon": "Öppnar snart"}[store.state];
 				td[1].innerText = (Math.round(store.dist*10)/10)+"km";
 				td[2].innerText = store.name;
 				let link = store.contact;
