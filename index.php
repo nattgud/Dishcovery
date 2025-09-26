@@ -56,7 +56,6 @@ echo $default_dist;
 			lat: lat,
 			dist: maxDist
 		});
-		//ajax(draw, "get.php?lat="+lat+"&long="+long+"&dist="+(Number(dist)+Number(acc)));
 	}
 	function mEl(tag = "DIV") {
 		return document.createElement(tag);
@@ -65,6 +64,9 @@ echo $default_dist;
 		progress("Populating list");
 		let out = document.querySelector("#out");
 		out.innerHTML = "";
+<?php
+if(!isset($_GET["tables"])) {
+?>
 		//		Cards
 		data.sort(function(a, b) {
 			return Number(a.dist)-Number(b.dist);
@@ -99,19 +101,16 @@ echo $default_dist;
 				linkImage = mEl("IMG");
 				linkImage.src = "img/url.png";
 				link.appendChild(linkImage);
-				//link = "<a href='"+link+"' target='_blank'><img src='img/url.png' style='width: 20px;'></a>";
 			} else if(store.contact.trim().length > 0) {
 				link.href = "tel:"+store.contact;
 				link.target = "_blank";
 				linkImage = mEl("IMG");
 				linkImage.src = "img/phone.png";
 				link.appendChild(linkImage);
-				//link = "<a href='tel:"+link+"' target='_blank'><img src='img/phone.png' style='width: 20px;'></a>";
 			} else {
 				link = mEl("P");
 				link.innerText = store.contact
 			}
-			//contactContainer.innerHTML = link;
 			contactContainer.appendChild(link);
 			card.appendChild(contactContainer);
 			
@@ -130,7 +129,9 @@ echo $default_dist;
 		if(out.children.length === 0) {
 			out.innerText = "No places inside the radius.";
 		}
-		/*
+<?php
+} else {
+?>
 		//		Table
 		if(data.length === 0) {
 			out.innerHTML = "<tr><td colspan=7>No place within the radius</td></tr>";
@@ -173,7 +174,9 @@ echo $default_dist;
 				out.appendChild(row);
 			}
 		}
-		*/
+<?php
+}
+?>
 		document.querySelector("#log").style.display = "none";
 		reloadTimer = setTimeout(reloadData, 60000*5);
 		document.querySelector("#distinput").disabled = false;
@@ -188,12 +191,41 @@ echo $default_dist;
 </script>
 </head>
 <body>
-<p id="log">Loading <span id="progress"></span></p>
-<section>
-	<p>Search radius: <span id="dist"><?php echo $default_dist;	?></span>km<input type="range" min="0.5" max="20" step="0.5" value="<?php echo $default_dist;	?>" style="width: 100%;" onchange="updDist(this.value);" id="distinput"></p>
-	<!--
-	<table><thead><th></th><th>Distance</th><th colspan=3>Name</th><th>Open</th><th>Close</th></tr></thead><tbody id="out"></tbody></table>-->
-	<div id="out"></div>
-</section>
+	<header>
+		<div><img src="img/logo.png?new"></div>
+		<div><h1>Dishcovery</h1>
+		<p id="log">Loading <span id="progress"></span></p>
+		<p>Search radius: <span id="dist"><?php echo $default_dist;	?></span>km</p></div>
+		<input type="range" min="0.5" max="20" step="0.5" value="<?php echo $default_dist;	?>" onchange="updDist(this.value);" id="distinput">
+	</header>
+	<main>
+		<section>
+<?php
+if(!isset($_GET["tables"])) {
+?>
+			<div id="out"></div>
+<?php
+} else {
+?>
+			<table><thead><th></th><th>Distance</th><th colspan=3>Name</th><th>Open</th><th>Close</th></tr></thead><tbody id="out"></tbody></table>
+<?php
+}
+?>
+		</section>
+	</main>
+	<footer>
+<?php
+if(!isset($_GET["tables"])) {
+?>
+		<a href="./?tables">Byt till tabellvy</a>
+<?php
+} else {
+?>
+		<a href=".">Byt till standardvy</a>
+<?php
+}
+?>
+		<p>&copy; Copyright David Andersson 2025</p>
+	</footer>
 </body>
 </html>
