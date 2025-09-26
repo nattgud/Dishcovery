@@ -1,7 +1,7 @@
 # Dishcovery
 Dishcovery is a minimalistic web app that shows nearby fast-food places with distance, opening hours, and real-time status.
 
-🌐 Live demo: [infinite-boxes.com/mat](https://infinite-boxes.com/mat/)
+🌐 Live demo: [infinite-boxes.com/mat](https://infinite-boxes.com/dishcovery/)
 
 ## Features
 - 📍 **Location-based** — finds restaurants near your position  
