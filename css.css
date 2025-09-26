@@ -73,6 +73,9 @@ footer p {
 	}
 }
 @media screen and (max-width: 600px) {
+	.card > span:nth-of-type(1) {
+		width: calc(20vw + 20px)!important;
+	}
 	.card img {
 		width: 10vw;
 		height: 10vw;
@@ -133,7 +136,7 @@ th {
 	display: inline-block;
 }
 .card > span:nth-of-type(1) {
-	width: calc(20vw + 20px);
+	width: calc(10vw + 20px);
 }
 .card > span:nth-of-type(2) {
 	padding-left: 5px;
